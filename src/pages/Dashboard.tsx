@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, Briefcase, TrendingUp } from "lucide-react";
+import { Building2, Users, Briefcase, ClipboardList, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,8 @@ interface Stats {
   totalObras: number;
   obrasEmAndamento: number;
   totalProfissionais: number;
-  totalProfissoes: number;
+  totalEquipes: number;
+  tarefasPendentes: number;
 }
 
 const Dashboard = () => {
@@ -20,7 +21,8 @@ const Dashboard = () => {
     totalObras: 0,
     obrasEmAndamento: 0,
     totalProfissionais: 0,
-    totalProfissoes: 0,
+    totalEquipes: 0,
+    tarefasPendentes: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -40,18 +42,27 @@ const Dashboard = () => {
 
       const obras = obrasResult.data || [];
       const obrasEmAndamento = obras.filter((o) => o.status === "in_progress").length;
+      const obraIds = obras.map((o) => o.id);
 
-      // Count total profissoes across all user's obras
-      const { count: profissoesCount } = await supabase
-        .from("profissoes")
+      // Count equipes
+      const { count: equipesCount } = await supabase
+        .from("equipes")
         .select("*", { count: "exact", head: true })
-        .in("obra_id", obras.map((o) => o.id));
+        .in("obra_id", obraIds);
+
+      // Count tarefas pendentes
+      const { count: tarefasPendentesCount } = await supabase
+        .from("tarefas")
+        .select("*", { count: "exact", head: true })
+        .in("obra_id", obraIds)
+        .in("status", ["pendente", "em_andamento"]);
 
       setStats({
         totalObras: obras.length,
         obrasEmAndamento,
         totalProfissionais: profissionaisResult.count || 0,
-        totalProfissoes: profissoesCount || 0,
+        totalEquipes: equipesCount || 0,
+        tarefasPendentes: tarefasPendentesCount || 0,
       });
       setLoading(false);
     };
@@ -68,18 +79,25 @@ const Dashboard = () => {
       color: "text-primary",
     },
     {
+      title: "Equipes Ativas",
+      value: stats.totalEquipes,
+      description: "Trabalhando nas obras",
+      icon: UserCheck,
+      color: "text-success",
+    },
+    {
+      title: "Tarefas Ativas",
+      value: stats.tarefasPendentes,
+      description: "Pendentes/Em andamento",
+      icon: ClipboardList,
+      color: "text-warning",
+    },
+    {
       title: "Profissionais",
       value: stats.totalProfissionais,
       description: "Cadastrados na plataforma",
       icon: Users,
       color: "text-accent",
-    },
-    {
-      title: "Profissões",
-      value: stats.totalProfissoes,
-      description: "Nas suas obras",
-      icon: Briefcase,
-      color: "text-success",
     },
   ];
 
@@ -89,11 +107,11 @@ const Dashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground mt-2">
-            Visão geral das suas obras e profissionais
+            Visão geral das suas obras, equipes e tarefas
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
