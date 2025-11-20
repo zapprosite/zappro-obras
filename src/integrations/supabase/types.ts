@@ -14,6 +14,196 @@ export type Database = {
   }
   public: {
     Tables: {
+      equipe_profissionais: {
+        Row: {
+          created_at: string
+          data_entrada: string
+          data_saida: string | null
+          equipe_id: string
+          id: string
+          profissional_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_entrada?: string
+          data_saida?: string | null
+          equipe_id: string
+          id?: string
+          profissional_id: string
+        }
+        Update: {
+          created_at?: string
+          data_entrada?: string
+          data_saida?: string | null
+          equipe_id?: string
+          id?: string
+          profissional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipe_profissionais_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipe_profissionais_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipes: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          dias_trabalho: string[] | null
+          horario_fim: string
+          horario_inicio: string
+          id: string
+          nome: string
+          obra_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          dias_trabalho?: string[] | null
+          horario_fim?: string
+          horario_inicio?: string
+          id?: string
+          nome: string
+          obra_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          dias_trabalho?: string[] | null
+          horario_fim?: string
+          horario_inicio?: string
+          id?: string
+          nome?: string
+          obra_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipes_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fornecedores: {
+        Row: {
+          contato: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fornecedores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      materiais: {
+        Row: {
+          created_at: string
+          custo_total: number | null
+          custo_unitario: number | null
+          fornecedor_id: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          quantidade: number
+          status: string
+          tarefa_id: string
+          unidade: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custo_total?: number | null
+          custo_unitario?: number | null
+          fornecedor_id?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          quantidade?: number
+          status?: string
+          tarefa_id: string
+          unidade?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custo_total?: number | null
+          custo_unitario?: number | null
+          fornecedor_id?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          quantidade?: number
+          status?: string
+          tarefa_id?: string
+          unidade?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materiais_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_tarefa_id_fkey"
+            columns: ["tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       obra_profissionais: {
         Row: {
           created_at: string
@@ -152,10 +342,13 @@ export type Database = {
           nome: string
           profissao_principal: string
           rating: number | null
+          salario_mensal: number | null
           skills: string[] | null
           telefone: string | null
+          tipo_contratacao: string | null
           updated_at: string
           user_id: string | null
+          valor_hora: number | null
         }
         Insert: {
           created_at?: string
@@ -165,10 +358,13 @@ export type Database = {
           nome: string
           profissao_principal: string
           rating?: number | null
+          salario_mensal?: number | null
           skills?: string[] | null
           telefone?: string | null
+          tipo_contratacao?: string | null
           updated_at?: string
           user_id?: string | null
+          valor_hora?: number | null
         }
         Update: {
           created_at?: string
@@ -178,10 +374,13 @@ export type Database = {
           nome?: string
           profissao_principal?: string
           rating?: number | null
+          salario_mensal?: number | null
           skills?: string[] | null
           telefone?: string | null
+          tipo_contratacao?: string | null
           updated_at?: string
           user_id?: string | null
+          valor_hora?: number | null
         }
         Relationships: [
           {
@@ -224,6 +423,117 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profissoes_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registros_ponto: {
+        Row: {
+          created_at: string
+          data: string
+          hora_entrada: string | null
+          hora_saida: string | null
+          horas_trabalhadas: number | null
+          id: string
+          obra_id: string
+          observacoes: string | null
+          profissional_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          hora_entrada?: string | null
+          hora_saida?: string | null
+          horas_trabalhadas?: number | null
+          id?: string
+          obra_id: string
+          observacoes?: string | null
+          profissional_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          hora_entrada?: string | null
+          hora_saida?: string | null
+          horas_trabalhadas?: number | null
+          id?: string
+          obra_id?: string
+          observacoes?: string | null
+          profissional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_ponto_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tarefas: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          equipe_id: string | null
+          id: string
+          obra_id: string
+          observacoes: string | null
+          prioridade: string
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          obra_id: string
+          observacoes?: string | null
+          prioridade?: string
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          id?: string
+          obra_id?: string
+          observacoes?: string | null
+          prioridade?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_obra_id_fkey"
             columns: ["obra_id"]
             isOneToOne: false
             referencedRelation: "obras"
