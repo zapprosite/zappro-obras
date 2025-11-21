@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Building2, LayoutDashboard, Briefcase, Users, LogOut } from "lucide-react";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { APP_NAME } from "@/constants/branding";
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,7 +32,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mr-3">
                   <Building2 className="h-5 w-5 text-primary" />
                 </div>
-                <span className="text-xl font-bold text-foreground">ObrasManager</span>
+                <span className="text-xl font-bold text-foreground">{APP_NAME}</span>
               </Link>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-2">
                 {navigation.map((item) => {
@@ -56,6 +58,7 @@ export const Layout = ({ children }: LayoutProps) => {
               <span className="text-sm text-muted-foreground hidden sm:block">
                 {user?.email}
               </span>
+              <ThemeSwitcher />
               <Button variant="outline" size="sm" onClick={signOut}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
