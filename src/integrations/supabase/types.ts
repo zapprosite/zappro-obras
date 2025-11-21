@@ -14,6 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          month: string
+          obra_id: string
+          profit_margin_percent: number | null
+          rework_tasks_count: number | null
+          total_budget: number | null
+          total_spent: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: string
+          obra_id: string
+          profit_margin_percent?: number | null
+          rework_tasks_count?: number | null
+          total_budget?: number | null
+          total_spent?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: string
+          obra_id?: string
+          profit_margin_percent?: number | null
+          rework_tasks_count?: number | null
+          total_budget?: number | null
+          total_spent?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_metrics_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clt_payroll: {
+        Row: {
+          created_at: string
+          decimo_terceiro_accrual: number | null
+          fgts: number
+          gross_salary: number
+          id: string
+          inss: number
+          irrf: number
+          month: string
+          net_salary: number
+          profissional_id: string
+          user_id: string
+          vacation_days_accrued: number | null
+        }
+        Insert: {
+          created_at?: string
+          decimo_terceiro_accrual?: number | null
+          fgts?: number
+          gross_salary?: number
+          id?: string
+          inss?: number
+          irrf?: number
+          month: string
+          net_salary?: number
+          profissional_id: string
+          user_id: string
+          vacation_days_accrued?: number | null
+        }
+        Update: {
+          created_at?: string
+          decimo_terceiro_accrual?: number | null
+          fgts?: number
+          gross_salary?: number
+          id?: string
+          inss?: number
+          irrf?: number
+          month?: string
+          net_salary?: number
+          profissional_id?: string
+          user_id?: string
+          vacation_days_accrued?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clt_payroll_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          obra_id: string
+          upload_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type?: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          obra_id: string
+          upload_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          obra_id?: string
+          upload_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipe_profissionais: {
         Row: {
           created_at: string
@@ -299,6 +440,107 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personal_tasks: {
+        Row: {
+          category: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pj_invoices: {
+        Row: {
+          created_at: string
+          gross_value: number
+          id: string
+          inss_prolabore: number | null
+          invoice_date: string
+          invoice_number: string
+          irrf: number | null
+          iss: number | null
+          net_value: number
+          payment_date: string | null
+          profissional_id: string
+          service_description: string | null
+          taxes_paid: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gross_value?: number
+          id?: string
+          inss_prolabore?: number | null
+          invoice_date: string
+          invoice_number: string
+          irrf?: number | null
+          iss?: number | null
+          net_value?: number
+          payment_date?: string | null
+          profissional_id: string
+          service_description?: string | null
+          taxes_paid?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gross_value?: number
+          id?: string
+          inss_prolabore?: number | null
+          invoice_date?: string
+          invoice_number?: string
+          irrf?: number | null
+          iss?: number | null
+          net_value?: number
+          payment_date?: string | null
+          profissional_id?: string
+          service_description?: string | null
+          taxes_paid?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pj_invoices_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
             referencedColumns: ["id"]
           },
         ]
