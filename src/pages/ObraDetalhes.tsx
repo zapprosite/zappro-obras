@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign } from "lucide-react";
+import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText } from "lucide-react";
 import { EquipesTab } from "@/components/obra-detalhes/EquipesTab";
 import { TarefasTab } from "@/components/obra-detalhes/TarefasTab";
 import { MateriaisTab } from "@/components/obra-detalhes/MateriaisTab";
 import { PontoTab } from "@/components/obra-detalhes/PontoTab";
+import { DocumentosTab } from "@/components/obra-detalhes/DocumentosTab";
 
 interface Obra {
   id: string;
@@ -162,7 +163,7 @@ const ObraDetalhes = () => {
         </div>
 
         <Tabs defaultValue="equipes" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="equipes">
               <Users className="h-4 w-4 mr-2" />
               Equipes
@@ -178,6 +179,10 @@ const ObraDetalhes = () => {
             <TabsTrigger value="ponto">
               <Clock className="h-4 w-4 mr-2" />
               Ponto
+            </TabsTrigger>
+            <TabsTrigger value="documentos">
+              <FileText className="h-4 w-4 mr-2" />
+              Documentos
             </TabsTrigger>
           </TabsList>
 
@@ -195,6 +200,10 @@ const ObraDetalhes = () => {
 
           <TabsContent value="ponto">
             <PontoTab obraId={id!} />
+          </TabsContent>
+
+          <TabsContent value="documentos">
+            <DocumentosTab obraId={id!} />
           </TabsContent>
         </Tabs>
       </div>
