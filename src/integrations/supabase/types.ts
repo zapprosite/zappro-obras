@@ -578,6 +578,7 @@ export type Database = {
       profissionais: {
         Row: {
           created_at: string
+          deleted: boolean | null
           disponivel: boolean | null
           email: string | null
           id: string
@@ -594,6 +595,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted?: boolean | null
           disponivel?: boolean | null
           email?: string | null
           id?: string
@@ -610,6 +612,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted?: boolean | null
           disponivel?: boolean | null
           email?: string | null
           id?: string

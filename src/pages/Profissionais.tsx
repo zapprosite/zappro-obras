@@ -4,11 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Users, Star, Phone, Mail } from "lucide-react";
+import { Plus, Users, Star, Phone, Mail, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteConfirmationModal } from "@/components/DeleteConfirmationModal";
+import { useDeleteProfessional } from "@/hooks/useDeleteProfessional";
 
 interface Profissional {
   id: string;
@@ -26,6 +28,9 @@ const Profissionais = () => {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProfissional, setSelectedProfissional] = useState<Profissional | null>(null);
+  const { loading: deleteLoading, taskCount, checkProfessionalTasks, deleteProfessional } = useDeleteProfessional();
   const [formData, setFormData] = useState({
     nome: "",
     profissao_principal: "",
@@ -39,6 +44,7 @@ const Profissionais = () => {
       .from("profissionais")
       .select("*")
       .eq("disponivel", true)
+      .eq("deleted", false)
       .order("rating", { ascending: false });
 
     if (error) {
@@ -93,6 +99,23 @@ const Profissionais = () => {
         telefone: "",
         email: "",
       });
+      fetchProfissionais();
+    }
+  };
+
+  const handleDeleteClick = async (prof: Profissional) => {
+    setSelectedProfissional(prof);
+    await checkProfessionalTasks(prof.id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedProfissional) return;
+    
+    const success = await deleteProfessional(selectedProfissional.id);
+    if (success) {
+      setDeleteModalOpen(false);
+      setSelectedProfissional(null);
       fetchProfissionais();
     }
   };
@@ -198,9 +221,17 @@ const Profissionais = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {profissionais.map((prof) => (
-              <Card key={prof.id} className="border-border/50 hover:shadow-lg transition-shadow">
+              <Card key={prof.id} className="border-border/50 hover:shadow-lg transition-shadow relative group">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => handleDeleteClick(prof)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between pr-8">
                     <div>
                       <CardTitle className="text-lg">{prof.nome}</CardTitle>
                       <CardDescription>{prof.profissao_principal}</CardDescription>
@@ -247,6 +278,15 @@ const Profissionais = () => {
             ))}
           </div>
         )}
+
+        <DeleteConfirmationModal
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          profissionalNome={selectedProfissional?.nome || ""}
+          taskCount={taskCount}
+          onConfirm={handleConfirmDelete}
+          loading={deleteLoading}
+        />
       </div>
     </Layout>
   );
