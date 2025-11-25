@@ -62,6 +62,7 @@ export const EquipesTab = ({ obraId }: { obraId: string }) => {
       .from("equipes")
       .select("*")
       .eq("obra_id", obraId)
+      .eq("deleted", false)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -82,6 +83,7 @@ export const EquipesTab = ({ obraId }: { obraId: string }) => {
       .from("profissionais")
       .select("*")
       .eq("disponivel", true)
+      .eq("deleted", false)
       .order("nome");
 
     if (error) {

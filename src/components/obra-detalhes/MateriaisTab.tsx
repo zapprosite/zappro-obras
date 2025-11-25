@@ -51,6 +51,7 @@ export const MateriaisTab = ({ obraId }: { obraId: string }) => {
         )
       `)
       .eq("tarefas.obra_id", obraId)
+      .eq("deleted", false)
       .order("created_at", { ascending: false });
 
     if (error) {

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, Users, Briefcase, ClipboardList, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 
 interface Stats {
   totalObras: number;
@@ -26,49 +27,59 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const fetchStats = async () => {
+    if (!user) return;
+
+    const [obrasResult, profissionaisResult] = await Promise.all([
+      supabase
+        .from("obras")
+        .select("id, status")
+        .eq("user_id", user.id)
+        .eq("deleted", false),
+      supabase
+        .from("profissionais")
+        .select("id", { count: "exact", head: true })
+        .eq("deleted", false),
+    ]);
+
+    const obras = obrasResult.data || [];
+    const obrasEmAndamento = obras.filter((o) => o.status === "in_progress").length;
+    const obraIds = obras.map((o) => o.id);
+
+    // Count equipes
+    const { count: equipesCount } = await supabase
+      .from("equipes")
+      .select("*", { count: "exact", head: true })
+      .in("obra_id", obraIds)
+      .eq("deleted", false);
+
+    // Count tarefas pendentes
+    const { count: tarefasPendentesCount } = await supabase
+      .from("tarefas")
+      .select("*", { count: "exact", head: true })
+      .in("obra_id", obraIds)
+      .in("status", ["pendente", "em_andamento"])
+      .eq("deleted", false);
+
+    setStats({
+      totalObras: obras.length,
+      obrasEmAndamento,
+      totalProfissionais: profissionaisResult.count || 0,
+      totalEquipes: equipesCount || 0,
+      tarefasPendentes: tarefasPendentesCount || 0,
+    });
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!user) return;
-
-      const [obrasResult, profissionaisResult] = await Promise.all([
-        supabase
-          .from("obras")
-          .select("id, status")
-          .eq("user_id", user.id),
-        supabase
-          .from("profissionais")
-          .select("id", { count: "exact", head: true }),
-      ]);
-
-      const obras = obrasResult.data || [];
-      const obrasEmAndamento = obras.filter((o) => o.status === "in_progress").length;
-      const obraIds = obras.map((o) => o.id);
-
-      // Count equipes
-      const { count: equipesCount } = await supabase
-        .from("equipes")
-        .select("*", { count: "exact", head: true })
-        .in("obra_id", obraIds);
-
-      // Count tarefas pendentes
-      const { count: tarefasPendentesCount } = await supabase
-        .from("tarefas")
-        .select("*", { count: "exact", head: true })
-        .in("obra_id", obraIds)
-        .in("status", ["pendente", "em_andamento"]);
-
-      setStats({
-        totalObras: obras.length,
-        obrasEmAndamento,
-        totalProfissionais: profissionaisResult.count || 0,
-        totalEquipes: equipesCount || 0,
-        tarefasPendentes: tarefasPendentesCount || 0,
-      });
-      setLoading(false);
-    };
-
     fetchStats();
   }, [user]);
+
+  // Realtime subscriptions for dashboard updates
+  useRealtimeSubscription("obras", fetchStats);
+  useRealtimeSubscription("profissionais", fetchStats);
+  useRealtimeSubscription("equipes", fetchStats);
+  useRealtimeSubscription("tarefas", fetchStats);
 
   const statCards = [
     {
