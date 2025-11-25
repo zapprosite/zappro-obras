@@ -63,6 +63,7 @@ const Obras = () => {
       .from("obras")
       .select("*")
       .eq("user_id", user.id)
+      .eq("deleted", false)
       .order("created_at", { ascending: false });
 
     if (error) {

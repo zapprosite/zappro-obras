@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText } from "lucide-react";
+import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { EditObraDialog } from "@/components/obra-detalhes/EditObraDialog";
+import { DeleteObraDialog } from "@/components/obra-detalhes/DeleteObraDialog";
+import { deleteObra } from "@/services/obraService";
 import { EquipesTab } from "@/components/obra-detalhes/EquipesTab";
 import { TarefasTab } from "@/components/obra-detalhes/TarefasTab";
 import { MateriaisTab } from "@/components/obra-detalhes/MateriaisTab";
@@ -48,6 +52,9 @@ const ObraDetalhes = () => {
   const navigate = useNavigate();
   const [obra, setObra] = useState<Obra | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchObra();
@@ -74,6 +81,29 @@ const ObraDetalhes = () => {
       setObra(data);
     }
     setLoading(false);
+  };
+
+  const handleDeleteObra = async () => {
+    if (!id) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteObra(id);
+      toast({
+        title: "Obra deletada com sucesso",
+        description: "A obra foi removida do sistema.",
+      });
+      navigate("/obras");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao deletar obra",
+        description: error.message,
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
   };
 
   if (loading) {
@@ -118,6 +148,26 @@ const ObraDetalhes = () => {
               <p className="text-muted-foreground mt-2">{obra.descricao}</p>
             )}
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Editar Obra
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setDeleteDialogOpen(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Deletar Obra
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -207,6 +257,24 @@ const ObraDetalhes = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {obra && (
+        <>
+          <EditObraDialog
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            obra={obra}
+            onSuccess={fetchObra}
+          />
+          <DeleteObraDialog
+            open={deleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+            obraNome={obra.nome}
+            onConfirm={handleDeleteObra}
+            loading={isDeleting}
+          />
+        </>
+      )}
     </Layout>
   );
 };

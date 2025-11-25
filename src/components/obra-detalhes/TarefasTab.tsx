@@ -85,6 +85,7 @@ export const TarefasTab = ({ obraId }: { obraId: string }) => {
         equipes (nome)
       `)
       .eq("obra_id", obraId)
+      .eq("deleted", false)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -102,11 +103,19 @@ export const TarefasTab = ({ obraId }: { obraId: string }) => {
   const fetchEquipes = async () => {
     const { data, error } = await supabase
       .from("equipes")
-      .select("id, nome")
-      .eq("obra_id", obraId);
+      .select("*")
+      .eq("obra_id", obraId)
+      .eq("deleted", false)
+      .order("nome");
 
-    if (!error && data) {
-      setEquipes(data);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar equipes",
+        description: error.message,
+      });
+    } else {
+      setEquipes(data || []);
     }
   };
 

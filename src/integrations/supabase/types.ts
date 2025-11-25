@@ -200,6 +200,7 @@ export type Database = {
       equipes: {
         Row: {
           created_at: string
+          deleted: boolean | null
           descricao: string | null
           dias_trabalho: string[] | null
           horario_fim: string
@@ -211,6 +212,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted?: boolean | null
           descricao?: string | null
           dias_trabalho?: string[] | null
           horario_fim?: string
@@ -222,6 +224,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted?: boolean | null
           descricao?: string | null
           dias_trabalho?: string[] | null
           horario_fim?: string
@@ -290,6 +293,7 @@ export type Database = {
           created_at: string
           custo_total: number | null
           custo_unitario: number | null
+          deleted: boolean | null
           fornecedor_id: string | null
           id: string
           nome: string
@@ -304,6 +308,7 @@ export type Database = {
           created_at?: string
           custo_total?: number | null
           custo_unitario?: number | null
+          deleted?: boolean | null
           fornecedor_id?: string | null
           id?: string
           nome: string
@@ -318,6 +323,7 @@ export type Database = {
           created_at?: string
           custo_total?: number | null
           custo_unitario?: number | null
+          deleted?: boolean | null
           fornecedor_id?: string | null
           id?: string
           nome?: string
@@ -402,6 +408,7 @@ export type Database = {
           created_at: string
           data_fim: string | null
           data_inicio: string | null
+          deleted: boolean | null
           descricao: string | null
           id: string
           nome: string
@@ -414,6 +421,7 @@ export type Database = {
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          deleted?: boolean | null
           descricao?: string | null
           id?: string
           nome: string
@@ -426,6 +434,7 @@ export type Database = {
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          deleted?: boolean | null
           descricao?: string | null
           id?: string
           nome?: string
@@ -731,6 +740,7 @@ export type Database = {
           created_at: string
           data_fim: string | null
           data_inicio: string | null
+          deleted: boolean | null
           descricao: string | null
           equipe_id: string | null
           id: string
@@ -745,6 +755,7 @@ export type Database = {
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          deleted?: boolean | null
           descricao?: string | null
           equipe_id?: string | null
           id?: string
@@ -759,6 +770,7 @@ export type Database = {
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          deleted?: boolean | null
           descricao?: string | null
           equipe_id?: string | null
           id?: string
