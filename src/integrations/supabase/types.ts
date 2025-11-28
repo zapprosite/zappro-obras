@@ -744,9 +744,11 @@ export type Database = {
           descricao: string | null
           equipe_id: string | null
           id: string
+          lane: string
           obra_id: string
           observacoes: string | null
           prioridade: string
+          sort_order: number
           status: string
           titulo: string
           updated_at: string
@@ -759,9 +761,11 @@ export type Database = {
           descricao?: string | null
           equipe_id?: string | null
           id?: string
+          lane?: string
           obra_id: string
           observacoes?: string | null
           prioridade?: string
+          sort_order?: number
           status?: string
           titulo: string
           updated_at?: string
@@ -774,9 +778,11 @@ export type Database = {
           descricao?: string | null
           equipe_id?: string | null
           id?: string
+          lane?: string
           obra_id?: string
           observacoes?: string | null
           prioridade?: string
+          sort_order?: number
           status?: string
           titulo?: string
           updated_at?: string
