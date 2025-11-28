@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText, MoreVertical, Pencil, Trash2, CalendarDays } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EditObraDialog } from "@/components/obra-detalhes/EditObraDialog";
 import { DeleteObraDialog } from "@/components/obra-detalhes/DeleteObraDialog";
@@ -18,6 +18,7 @@ import { TarefasTab } from "@/components/obra-detalhes/TarefasTab";
 import { MateriaisTab } from "@/components/obra-detalhes/MateriaisTab";
 import { PontoTab } from "@/components/obra-detalhes/PontoTab";
 import { DocumentosTab } from "@/components/obra-detalhes/DocumentosTab";
+import { WeeklyScheduleBoard } from "@/components/kanban/WeeklyScheduleBoard";
 
 interface Obra {
   id: string;
@@ -212,8 +213,12 @@ const ObraDetalhes = () => {
           )}
         </div>
 
-        <Tabs defaultValue="equipes" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="cronograma" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="cronograma">
+              <CalendarDays className="h-4 w-4 mr-2" />
+              Cronograma
+            </TabsTrigger>
             <TabsTrigger value="equipes">
               <Users className="h-4 w-4 mr-2" />
               Equipes
@@ -235,6 +240,10 @@ const ObraDetalhes = () => {
               Documentos
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="cronograma">
+            <WeeklyScheduleBoard obraId={id!} />
+          </TabsContent>
 
           <TabsContent value="equipes">
             <EquipesTab obraId={id!} />
