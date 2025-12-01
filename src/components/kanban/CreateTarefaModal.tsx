@@ -18,6 +18,7 @@ interface CreateTarefaModalProps {
   obraId: string;
   equipes: Equipe[];
   initialSlot: { date: Date; hour: number } | null;
+  initialLane?: TarefaLane;
   onSuccess: () => void;
 }
 
@@ -27,6 +28,7 @@ export function CreateTarefaModal({
   obraId,
   equipes,
   initialSlot,
+  initialLane = "backlog",
   onSuccess,
 }: CreateTarefaModalProps) {
   const { toast } = useToast();
@@ -36,32 +38,34 @@ export function CreateTarefaModal({
     descricao: "",
     status: "pendente" as TarefaStatus,
     prioridade: "media" as TarefaPrioridade,
-    lane: "todo" as TarefaLane,
+    lane: initialLane,
     data_inicio: "",
     data_fim: "",
     equipe_id: "",
   });
 
   useEffect(() => {
-    if (initialSlot) {
-      const startDate = setMinutes(setHours(initialSlot.date, initialSlot.hour), 0);
-      const endDate = setMinutes(setHours(initialSlot.date, initialSlot.hour + 1), 0);
+    if (open) {
+      if (initialSlot) {
+        const startDate = setMinutes(setHours(initialSlot.date, initialSlot.hour), 0);
+        const endDate = setMinutes(setHours(initialSlot.date, initialSlot.hour + 1), 0);
 
-      setFormData((prev) => ({
-        ...prev,
-        data_inicio: format(startDate, "yyyy-MM-dd'T'HH:mm"),
-        data_fim: format(endDate, "yyyy-MM-dd'T'HH:mm"),
-        lane: "todo",
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        data_inicio: "",
-        data_fim: "",
-        lane: "backlog",
-      }));
+        setFormData((prev) => ({
+          ...prev,
+          lane: initialLane,
+          data_inicio: format(startDate, "yyyy-MM-dd'T'HH:mm"),
+          data_fim: format(endDate, "yyyy-MM-dd'T'HH:mm"),
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          lane: initialLane,
+          data_inicio: "",
+          data_fim: "",
+        }));
+      }
     }
-  }, [initialSlot, open]);
+  }, [open, initialSlot, initialLane]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

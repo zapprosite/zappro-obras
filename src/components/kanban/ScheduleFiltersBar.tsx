@@ -21,6 +21,7 @@ interface ScheduleFiltersBarProps {
   onShowOverdueChange: (value: boolean) => void;
   currentWeek: Date;
   onWeekChange: (date: Date) => void;
+  hideWeekNavigation?: boolean;
 }
 
 export function ScheduleFiltersBar({
@@ -35,6 +36,7 @@ export function ScheduleFiltersBar({
   onShowOverdueChange,
   currentWeek,
   onWeekChange,
+  hideWeekNavigation = false,
 }: ScheduleFiltersBarProps) {
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -46,29 +48,31 @@ export function ScheduleFiltersBar({
   return (
     <div className="space-y-4">
       {/* Week Navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={goToPreviousWeek}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon" onClick={goToNextWeek}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={goToCurrentWeek}>
-            <Calendar className="h-4 w-4 mr-2" />
-            Hoje
-          </Button>
-        </div>
+      {!hideWeekNavigation && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={goToPreviousWeek}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={goToNextWeek}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={goToCurrentWeek}>
+              <Calendar className="h-4 w-4 mr-2" />
+              Hoje
+            </Button>
+          </div>
 
-        <div className="text-center">
-          <h3 className="font-semibold text-foreground">
-            {format(weekStart, "d 'de' MMMM", { locale: ptBR })} -{" "}
-            {format(weekEnd, "d 'de' MMMM, yyyy", { locale: ptBR })}
-          </h3>
-        </div>
+          <div className="text-center">
+            <h3 className="font-semibold text-foreground">
+              {format(weekStart, "d 'de' MMMM", { locale: ptBR })} -{" "}
+              {format(weekEnd, "d 'de' MMMM, yyyy", { locale: ptBR })}
+            </h3>
+          </div>
 
-        <div className="w-[120px]" /> {/* Spacer for alignment */}
-      </div>
+          <div className="w-[120px]" /> {/* Spacer for alignment */}
+        </div>
+      )}
 
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-4">
