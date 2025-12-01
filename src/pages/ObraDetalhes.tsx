@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText, MoreVertical, Pencil, Trash2, CalendarDays } from "lucide-react";
+import { ArrowLeft, Building2, Users, ClipboardList, Package, Clock, DollarSign, FileText, MoreVertical, Pencil, Trash2, CalendarDays, Trello } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EditObraDialog } from "@/components/obra-detalhes/EditObraDialog";
 import { DeleteObraDialog } from "@/components/obra-detalhes/DeleteObraDialog";
@@ -19,6 +19,7 @@ import { MateriaisTab } from "@/components/obra-detalhes/MateriaisTab";
 import { PontoTab } from "@/components/obra-detalhes/PontoTab";
 import { DocumentosTab } from "@/components/obra-detalhes/DocumentosTab";
 import { WeeklyScheduleBoard } from "@/components/kanban/WeeklyScheduleBoard";
+import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 
 interface Obra {
   id: string;
@@ -213,19 +214,23 @@ const ObraDetalhes = () => {
           )}
         </div>
 
-        <Tabs defaultValue="cronograma" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+        <Tabs defaultValue="kanban" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="kanban">
+              <Trello className="h-4 w-4 mr-2" />
+              Kanban
+            </TabsTrigger>
             <TabsTrigger value="cronograma">
               <CalendarDays className="h-4 w-4 mr-2" />
               Cronograma
             </TabsTrigger>
-            <TabsTrigger value="equipes">
-              <Users className="h-4 w-4 mr-2" />
-              Equipes
-            </TabsTrigger>
             <TabsTrigger value="tarefas">
               <ClipboardList className="h-4 w-4 mr-2" />
               Tarefas
+            </TabsTrigger>
+            <TabsTrigger value="equipes">
+              <Users className="h-4 w-4 mr-2" />
+              Equipes
             </TabsTrigger>
             <TabsTrigger value="materiais">
               <Package className="h-4 w-4 mr-2" />
@@ -240,6 +245,10 @@ const ObraDetalhes = () => {
               Documentos
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="kanban">
+            <KanbanBoard obraId={id!} />
+          </TabsContent>
 
           <TabsContent value="cronograma">
             <WeeklyScheduleBoard obraId={id!} />
