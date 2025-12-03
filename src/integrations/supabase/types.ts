@@ -290,48 +290,75 @@ export type Database = {
       }
       materiais: {
         Row: {
+          categoria: string | null
           created_at: string
+          created_by: string | null
           custo_total: number | null
           custo_unitario: number | null
+          data_entrega_estimada: string | null
+          data_entrega_real: string | null
           deleted: boolean | null
+          descricao: string | null
           fornecedor_id: string | null
           id: string
+          lote: string | null
           nome: string
+          notas: string | null
+          obra_id: string | null
           observacoes: string | null
           quantidade: number
           status: string
-          tarefa_id: string
+          tarefa_id: string | null
           unidade: string
+          unidade_medida: string | null
           updated_at: string
         }
         Insert: {
+          categoria?: string | null
           created_at?: string
+          created_by?: string | null
           custo_total?: number | null
           custo_unitario?: number | null
+          data_entrega_estimada?: string | null
+          data_entrega_real?: string | null
           deleted?: boolean | null
+          descricao?: string | null
           fornecedor_id?: string | null
           id?: string
+          lote?: string | null
           nome: string
+          notas?: string | null
+          obra_id?: string | null
           observacoes?: string | null
           quantidade?: number
           status?: string
-          tarefa_id: string
+          tarefa_id?: string | null
           unidade?: string
+          unidade_medida?: string | null
           updated_at?: string
         }
         Update: {
+          categoria?: string | null
           created_at?: string
+          created_by?: string | null
           custo_total?: number | null
           custo_unitario?: number | null
+          data_entrega_estimada?: string | null
+          data_entrega_real?: string | null
           deleted?: boolean | null
+          descricao?: string | null
           fornecedor_id?: string | null
           id?: string
+          lote?: string | null
           nome?: string
+          notas?: string | null
+          obra_id?: string | null
           observacoes?: string | null
           quantidade?: number
           status?: string
-          tarefa_id?: string
+          tarefa_id?: string | null
           unidade?: string
+          unidade_medida?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -340,6 +367,13 @@ export type Database = {
             columns: ["fornecedor_id"]
             isOneToOne: false
             referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materiais_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
             referencedColumns: ["id"]
           },
           {
