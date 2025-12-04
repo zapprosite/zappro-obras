@@ -8,6 +8,7 @@ import { ScheduleFiltersBar } from "./ScheduleFiltersBar";
 import { KanbanColumn } from "./KanbanColumn";
 import { EditTarefaModal } from "./EditTarefaModal";
 import { CreateTarefaModal } from "./CreateTarefaModal";
+import { KanbanSkeleton } from "@/components/ui/skeleton-loaders";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import type { TarefaKanban, Equipe, TarefaLane } from "@/types/kanban";
 
@@ -208,8 +209,13 @@ export function KanbanBoard({ obraId }: KanbanBoardProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-muted-foreground">Carregando kanban...</p>
+      <div className="space-y-4 h-full flex flex-col">
+        <div className="flex gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-10 bg-muted/20 rounded animate-pulse flex-1" />
+          ))}
+        </div>
+        <KanbanSkeleton />
       </div>
     );
   }

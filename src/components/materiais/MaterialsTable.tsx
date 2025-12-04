@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Material, STATUS_LABELS, STATUS_COLORS, CATEGORIA_LABELS, MaterialCategoria, MaterialStatus } from "@/types/materials";
-import { format, parseISO } from "date-fns";
+import { formatDate, formatCurrency, formatNumber } from "@/lib/formatters";
 
 type SortField = 'nome' | 'categoria' | 'quantidade' | 'custo_unitario' | 'custo_total' | 'status' | 'data_entrega_estimada';
 type SortDirection = 'asc' | 'desc';
@@ -105,14 +105,14 @@ export function MaterialsTable({ materiais, onEdit, onDelete }: MaterialsTablePr
                 {material.categoria && CATEGORIA_LABELS[material.categoria as MaterialCategoria]}
               </TableCell>
               <TableCell className="text-right">
-                {material.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 3 })}
+                {formatNumber(material.quantidade, 3)}
               </TableCell>
               <TableCell>{material.unidade_medida || material.unidade}</TableCell>
               <TableCell className="text-right">
-                R$ {(material.custo_unitario || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                {formatCurrency(material.custo_unitario)}
               </TableCell>
               <TableCell className="text-right font-semibold">
-                R$ {(material.custo_total || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                {formatCurrency(material.custo_total)}
               </TableCell>
               <TableCell>
                 <Badge className={STATUS_COLORS[material.status as MaterialStatus]}>
@@ -120,11 +120,7 @@ export function MaterialsTable({ materiais, onEdit, onDelete }: MaterialsTablePr
                 </Badge>
               </TableCell>
               <TableCell>{material.fornecedores?.nome || '-'}</TableCell>
-              <TableCell>
-                {material.data_entrega_estimada
-                  ? format(parseISO(material.data_entrega_estimada), "dd/MM/yyyy")
-                  : '-'}
-              </TableCell>
+              <TableCell>{formatDate(material.data_entrega_estimada)}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
