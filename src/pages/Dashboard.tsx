@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, Briefcase, ClipboardList, UserCheck } from "lucide-react";
+import { Building2, Users, ClipboardList, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
+import { DashboardSkeleton } from "@/components/ui/skeleton-loaders";
 
 interface Stats {
   totalObras: number;
@@ -27,53 +28,65 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (!user) return;
 
-    const [obrasResult, profissionaisResult] = await Promise.all([
-      supabase
-        .from("obras")
-        .select("id, status")
-        .eq("user_id", user.id)
-        .eq("deleted", false),
-      supabase
-        .from("profissionais")
-        .select("id", { count: "exact", head: true })
-        .eq("deleted", false),
-    ]);
+    try {
+      const [obrasResult, profissionaisResult] = await Promise.all([
+        supabase
+          .from("obras")
+          .select("id, status")
+          .eq("user_id", user.id)
+          .eq("deleted", false),
+        supabase
+          .from("profissionais")
+          .select("id", { count: "exact", head: true })
+          .eq("deleted", false),
+      ]);
 
-    const obras = obrasResult.data || [];
-    const obrasEmAndamento = obras.filter((o) => o.status === "in_progress").length;
-    const obraIds = obras.map((o) => o.id);
+      const obras = obrasResult.data || [];
+      const obrasEmAndamento = obras.filter((o) => o.status === "in_progress").length;
+      const obraIds = obras.map((o) => o.id);
 
-    // Count equipes
-    const { count: equipesCount } = await supabase
-      .from("equipes")
-      .select("*", { count: "exact", head: true })
-      .in("obra_id", obraIds)
-      .eq("deleted", false);
+      let equipesCount = 0;
+      let tarefasPendentesCount = 0;
 
-    // Count tarefas pendentes
-    const { count: tarefasPendentesCount } = await supabase
-      .from("tarefas")
-      .select("*", { count: "exact", head: true })
-      .in("obra_id", obraIds)
-      .in("status", ["pendente", "em_andamento"])
-      .eq("deleted", false);
+      if (obraIds.length > 0) {
+        // Count equipes
+        const { count: eCount } = await supabase
+          .from("equipes")
+          .select("*", { count: "exact", head: true })
+          .in("obra_id", obraIds)
+          .eq("deleted", false);
+        equipesCount = eCount || 0;
 
-    setStats({
-      totalObras: obras.length,
-      obrasEmAndamento,
-      totalProfissionais: profissionaisResult.count || 0,
-      totalEquipes: equipesCount || 0,
-      tarefasPendentes: tarefasPendentesCount || 0,
-    });
-    setLoading(false);
-  };
+        // Count tarefas pendentes
+        const { count: tCount } = await supabase
+          .from("tarefas")
+          .select("*", { count: "exact", head: true })
+          .in("obra_id", obraIds)
+          .in("status", ["pendente", "em_andamento"])
+          .eq("deleted", false);
+        tarefasPendentesCount = tCount || 0;
+      }
+
+      setStats({
+        totalObras: obras.length,
+        obrasEmAndamento,
+        totalProfissionais: profissionaisResult.count || 0,
+        totalEquipes: equipesCount,
+        tarefasPendentes: tarefasPendentesCount,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     fetchStats();
-  }, [user]);
+  }, [fetchStats]);
 
   // Realtime subscriptions for dashboard updates
   useRealtimeSubscription("obras", fetchStats);
@@ -112,6 +125,14 @@ const Dashboard = () => {
     },
   ];
 
+  if (loading) {
+    return (
+      <Layout>
+        <DashboardSkeleton />
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="space-y-8">
@@ -135,7 +156,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">
-                    {loading ? "..." : stat.value}
+                    {stat.value}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {stat.description}

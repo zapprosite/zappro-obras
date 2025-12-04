@@ -211,17 +211,24 @@ export function CreateTarefaModal({
               <Label>Equipe</Label>
               <Select
                 value={formData.equipe_id}
-                onValueChange={(value) => setFormData({ ...formData, equipe_id: value })}
+                onValueChange={(value) => setFormData({ ...formData, equipe_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma equipe" />
                 </SelectTrigger>
                 <SelectContent>
-                  {equipes.map((equipe) => (
-                    <SelectItem key={equipe.id} value={equipe.id}>
-                      {equipe.nome}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="none">Sem equipe</SelectItem>
+                  {equipes.length === 0 ? (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      Nenhuma equipe cadastrada
+                    </div>
+                  ) : (
+                    equipes.map((equipe) => (
+                      <SelectItem key={equipe.id} value={equipe.id}>
+                        {equipe.nome}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

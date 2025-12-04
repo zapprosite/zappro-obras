@@ -1,9 +1,9 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Package, Plus, Download, Upload, Loader2 } from "lucide-react";
-import { Material, CreateMaterialDTO, UpdateMaterialDTO, MaterialCategoria, MaterialStatus } from "@/types/materials";
+import { Package, Plus, Download } from "lucide-react";
+import { Material, CreateMaterialDTO, UpdateMaterialDTO, STATUS_LABELS, CATEGORIA_LABELS } from "@/types/materials";
 import {
   fetchMateriaisByObra,
   createMaterial,
@@ -18,6 +18,9 @@ import { DeleteMaterialDialog } from "@/components/materiais/DeleteMaterialDialo
 import { MaterialsStatsCards } from "@/components/materiais/MaterialsStatsCards";
 import { MaterialsFilters } from "@/components/materiais/MaterialsFilters";
 import { MaterialsTable } from "@/components/materiais/MaterialsTable";
+import { MaterialsTableSkeleton } from "@/components/ui/skeleton-loaders";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
+import { escapeCSVValue, formatDate, formatCurrency } from "@/lib/formatters";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MateriaisTab = ({ obraId }: { obraId: string }) => {
@@ -37,12 +40,7 @@ export const MateriaisTab = ({ obraId }: { obraId: string }) => {
   const [categoriaFilter, setCategoriaFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    loadData();
-  }, [obraId]);
-
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = useCallback(async () => {
     try {
       const [materiaisData, fornecedoresData] = await Promise.all([
         fetchMateriaisByObra(obraId),
@@ -59,7 +57,14 @@ export const MateriaisTab = ({ obraId }: { obraId: string }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [obraId, toast]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Realtime subscription for materials
+  useRealtimeSubscription("materiais", loadData, [obraId]);
 
   const filteredMateriais = useMemo(() => {
     return materiais.filter((m) => {
@@ -128,20 +133,22 @@ export const MateriaisTab = ({ obraId }: { obraId: string }) => {
   };
 
   const handleExportCSV = () => {
-    const headers = ["Nome", "Categoria", "Quantidade", "Unidade", "Custo Unitário", "Custo Total", "Status", "Fornecedor", "Data Entrega"];
+    const headers = ["Nome", "Categoria", "Quantidade", "Unidade", "Custo Unitário", "Custo Total", "Status", "Fornecedor", "Data Entrega Estimada"];
     const rows = filteredMateriais.map((m) => [
-      m.nome,
-      m.categoria || "",
+      escapeCSVValue(m.nome),
+      escapeCSVValue(m.categoria ? CATEGORIA_LABELS[m.categoria] || m.categoria : ""),
       m.quantidade,
-      m.unidade_medida || m.unidade,
-      m.custo_unitario || 0,
-      m.custo_total || 0,
-      m.status,
-      m.fornecedores?.nome || "",
-      m.data_entrega_estimada || "",
+      escapeCSVValue(m.unidade_medida || m.unidade),
+      (m.custo_unitario || 0).toFixed(2).replace(".", ","),
+      (m.custo_total || 0).toFixed(2).replace(".", ","),
+      escapeCSVValue(STATUS_LABELS[m.status] || m.status),
+      escapeCSVValue(m.fornecedores?.nome || ""),
+      formatDate(m.data_entrega_estimada),
     ]);
 
-    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    // BOM for UTF-8 Excel compatibility
+    const BOM = "\uFEFF";
+    const csvContent = BOM + [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -160,11 +167,7 @@ export const MateriaisTab = ({ obraId }: { obraId: string }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <MaterialsTableSkeleton />;
   }
 
   return (
