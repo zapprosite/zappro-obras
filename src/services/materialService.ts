@@ -38,14 +38,24 @@ export async function fetchMateriaisByObra(obraId: string): Promise<Material[]> 
 }
 
 export async function createMaterial(data: CreateMaterialDTO): Promise<Material> {
-  const custoTotal = data.quantidade * data.custo_unitario;
-  
   const { data: result, error } = await supabase
     .from("materiais")
     .insert({
-      ...data,
-      custo_total: custoTotal,
+      nome: data.nome,
+      descricao: data.descricao,
+      quantidade: data.quantidade,
       unidade: data.unidade || data.unidade_medida || 'un',
+      unidade_medida: data.unidade_medida,
+      custo_unitario: data.custo_unitario,
+      status: data.status || 'solicitado',
+      categoria: data.categoria,
+      fornecedor_id: data.fornecedor_id,
+      data_entrega_estimada: data.data_entrega_estimada,
+      lote: data.lote,
+      notas: data.notas,
+      obra_id: data.obra_id,
+      tarefa_id: data.tarefa_id,
+      created_by: data.created_by,
     })
     .select(`
       *,
@@ -59,15 +69,28 @@ export async function createMaterial(data: CreateMaterialDTO): Promise<Material>
 }
 
 export async function updateMaterial(id: string, data: UpdateMaterialDTO): Promise<Material> {
-  const updateData: any = { ...data };
+  // Remove custo_total from update data - it's a computed column
+  const { ...updateData } = data;
   
-  if (data.quantidade !== undefined && data.custo_unitario !== undefined) {
-    updateData.custo_total = data.quantidade * data.custo_unitario;
-  }
-
   const { data: result, error } = await supabase
     .from("materiais")
-    .update(updateData)
+    .update({
+      nome: updateData.nome,
+      descricao: updateData.descricao,
+      quantidade: updateData.quantidade,
+      unidade: updateData.unidade || updateData.unidade_medida,
+      unidade_medida: updateData.unidade_medida,
+      custo_unitario: updateData.custo_unitario,
+      status: updateData.status,
+      categoria: updateData.categoria,
+      fornecedor_id: updateData.fornecedor_id,
+      data_entrega_estimada: updateData.data_entrega_estimada,
+      data_entrega_real: updateData.data_entrega_real,
+      lote: updateData.lote,
+      notas: updateData.notas,
+      obra_id: updateData.obra_id,
+      tarefa_id: updateData.tarefa_id,
+    })
     .eq("id", id)
     .select(`
       *,
