@@ -208,6 +208,7 @@ export type Database = {
           id: string
           nome: string
           obra_id: string
+          team_leader_id: string | null
           updated_at: string
         }
         Insert: {
@@ -220,6 +221,7 @@ export type Database = {
           id?: string
           nome: string
           obra_id: string
+          team_leader_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -232,6 +234,7 @@ export type Database = {
           id?: string
           nome?: string
           obra_id?: string
+          team_leader_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -838,14 +841,95 @@ export type Database = {
           },
         ]
       }
+      team_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          equipe_id: string | null
+          id: string
+          obra_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          equipe_id?: string | null
+          id?: string
+          obra_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          equipe_id?: string | null
+          id?: string
+          obra_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_assignments_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_assignments_obra_id_fkey"
+            columns: ["obra_id"]
+            isOneToOne: false
+            referencedRelation: "obras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_project_access: {
+        Args: { _obra_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "civil_engineer" | "team_leader"
       obra_status:
         | "planning"
         | "in_progress"
@@ -981,6 +1065,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "civil_engineer", "team_leader"],
       obra_status: [
         "planning",
         "in_progress",
