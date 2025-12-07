@@ -17,6 +17,9 @@ export const useUserRole = () => {
     loading: true,
     error: null,
   });
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
+
+  const refetch = () => setRefetchTrigger((prev) => prev + 1);
 
   useEffect(() => {
     if (!user) {
@@ -66,7 +69,7 @@ export const useUserRole = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, refetchTrigger]);
 
   const isAdmin = state.role === "admin";
   const isCivilEngineer = state.role === "civil_engineer" || isAdmin;
@@ -79,5 +82,6 @@ export const useUserRole = () => {
     isCivilEngineer,
     isTeamLeader,
     hasNoRole,
+    refetch,
   };
 };
